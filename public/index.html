@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <title>Aplikacja pogodowa</title>
+  <style>
+    body {
+      font-family: Arial;
+      max-width: 600px;
+      margin: 40px auto;
+      text-align: center;
+    }
+    select, button {
+      padding: 10px;
+      margin: 10px;
+      font-size: 16px;
+    }
+    #result {
+      margin-top: 20px;
+      text-align: left;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Sprawdź pogodę</h1>
+
+<select id="city">
+  <option value="Warsaw,Poland">Warszawa</option>
+  <option value="Krakow,Poland">Kraków</option>
+  <option value="Berlin,Germany">Berlin</option>
+  <option value="Paris,France">Paryż</option>
+  <option value="London,UK">Londyn</option>
+</select>
+
+<br>
+
+<button onclick="getWeather()">Pobierz dane pogodowe</button>
+
+<div id="result"></div>
+
+<script>
+async function getWeather() {
+  const value = document.getElementById('city').value;
+  const [city, country] = value.split(',');
+
+  const resultDiv = document.getElementById('result');
+  resultDiv.innerHTML = "Ładowanie...";
+
+  try {
+    const geoRes = await fetch(`/api/geocode?city=${city}&country=${country}`);
+    const geo = await geoRes.json();
+
+    const weatherRes = await fetch(`/api/weather?lat=${geo.latitude}&lon=${geo.longitude}`);
+    const weather = await weatherRes.json();
+
+    const current = weather.current;
+
+    resultDiv.innerHTML = `
+      <h3>${geo.name}, ${geo.country}</h3>
+      <p> Temperatura: ${current.temperature_2m} °C</p>
+      <p> Odczuwalna: ${current.apparent_temperature} °C</p>
+      <p> Wilgotność: ${current.relative_humidity_2m} %</p>
+      <p> Wiatr: ${current.wind_speed_10m} km/h</p>
+      <p> Opady: ${current.precipitation} mm</p>
+    `;
+  } catch (err) {
+    resultDiv.innerHTML = "Błąd pobierania danych";
+  }
+}
+</script>
+
+</body>
+</html>
