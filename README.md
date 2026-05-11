@@ -1,5 +1,5 @@
 Autor: Piotr Chrabąszcz
-
+Część obowiązkowa:
 1.Opis:
 aplikacja została napisana w Node.js i uruchamiana w kontenerze Docker
 
@@ -35,3 +35,12 @@ d.sprawdzenie ilości warstw
 docker history zadanie1:v1.0
 i policzenie warstw z rozmiarem większym od 0
 
+Część nieobowiązkowa 3. (max. +80%) (rozszerzenie do poprzedniej części):
+-11 luk w zabezpieczeniach na poziomie HIGH znalezionych w zabezpieczeniach, ale nie mają one znaczenia w tej aplikacji(opisane dokładniej w pliku pdf)
+-aplikacja wykorzystuje rozszerzony frontend BuildKit(deklaracja na początku Dockerfile)
+-w celu multiplatformowego budowania stworzyłem builder(polecenie: docker buildx create --use --name my_builder --driver docker-container)
+
+-kod źródłowy nie jest już kopiowany z lokalnego dysku tylko z repozytorium github używając mount secret
+-Access token został przekazany z pliku znajdującego się poza kontekstem(folderem) budowania
+-Budowanie obrazu dla amd64 i arm64 oraz wysłanie cache(tryb max) bezpośrednio do Dockerhub zostało zrealizowane poleceniem:
+docker buildx build --platform linux/amd64,linux/arm64 --secret id=github_token,src=C:\PAWCHO\token.txt -t chrabaszcz/zadanie1nob:v1.0 --cache-to=type=registry,ref=chrabaszcz/zadanie1nob:cache,mode=max --cache-from=type=registry,ref=chrabaszcz/zadanie1nob:cache --push .
